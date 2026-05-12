@@ -1,0 +1,363 @@
+from rest_framework import serializers
+
+from .models import (
+    User,
+    StudentProfile,
+    TeacherProfile
+)
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer
+)
+
+
+
+class CustomLoginSerializer(
+    TokenObtainPairSerializer
+):
+
+    def validate(self, attrs):
+
+        data = super().validate(attrs)
+
+        user = self.user
+
+        # COMMON USER DATA
+        response_data = {
+
+            'id': user.id,
+
+            'username': user.username,
+
+            'email': user.email,
+
+            'role': user.role,
+
+            'first_name': user.first_name,
+
+            'last_name': user.last_name,
+        }
+
+        # STUDENT PROFILE
+        if user.role == 'student':
+
+            try:
+
+                profile = StudentProfile.objects.get(
+                    user=user
+                )
+
+                response_data['student_profile'] = {
+
+                    'roll_number': profile.roll_number,
+
+                    'class_level': profile.class_level,
+
+                    'section': profile.section,
+
+                    'group': profile.group,
+                }
+
+            except StudentProfile.DoesNotExist:
+
+                response_data['student_profile'] = None
+
+        # TEACHER PROFILE
+        elif user.role == 'teacher':
+
+            try:
+
+                profile = TeacherProfile.objects.get(
+                    user=user
+                )
+
+                response_data['teacher_profile'] = {
+
+                    'employee_id': profile.employee_id,
+
+                    'department': profile.department,
+
+                    'designation': profile.designation,
+                }
+
+            except TeacherProfile.DoesNotExist:
+
+                response_data['teacher_profile'] = None
+
+        # FINAL RESPONSE
+        return {
+
+            'refresh': data['refresh'],
+
+            'access': data['access'],
+
+            'user': response_data
+        }
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    # STUDENT FIELDS
+    roll_number = serializers.IntegerField(
+        required=False
+    )
+
+    class_level = serializers.IntegerField(
+        required=False
+    )
+
+    section = serializers.CharField(
+        required=False
+    )
+
+    father_name = serializers.CharField(
+        required=False
+    )
+
+    mother_name = serializers.CharField(
+        required=False
+    )
+
+    address = serializers.CharField(
+        required=False
+    )
+
+    # TEACHER FIELDS
+    employee_id = serializers.CharField(
+        required=False
+    )
+
+    department = serializers.CharField(
+        required=False
+    )
+
+    designation = serializers.CharField(
+        required=False
+    )
+
+    class Meta:
+
+        model = User
+
+        fields = [
+            'username',
+            'email',
+            'password',
+            'role',
+            'first_name',
+            'last_name',
+
+            # student
+            'roll_number',
+            'class_level',
+            'section',
+            'father_name',
+            'mother_name',
+            'address',
+
+            # teacher
+            'employee_id',
+            'department',
+            'designation',
+        ]
+
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
+
+    def create(self, validated_data):
+
+
+
+        roll_number = validated_data.pop(
+            'roll_number',
+            None
+        )
+
+        class_level = validated_data.pop(
+            'class_level',
+            None
+        )
+
+        section = validated_data.pop(
+            'section',
+            None
+        )
+
+        father_name = validated_data.pop(
+            'father_name',
+            None
+        )
+
+        mother_name = validated_data.pop(
+            'mother_name',
+            None
+        )
+
+        address = validated_data.pop(
+            'address',
+            None
+        )
+
+        employee_id = validated_data.pop(
+            'employee_id',
+            None
+        )
+
+        department = validated_data.pop(
+            'department',
+            None
+        )
+
+        designation = validated_data.pop(
+            'designation',
+            None
+        )
+
+
+
+        password = validated_data.pop(
+            'password'
+        )
+
+        user = User(**validated_data)
+
+        user.set_password(password)
+
+        user.save()
+
+
+
+        if user.role == 'student':
+
+            StudentProfile.objects.create(
+
+                user=user,
+
+                roll_number=roll_number,
+
+                class_level=class_level,
+
+                section=section,
+
+                father_name=father_name,
+
+                mother_name=mother_name,
+
+                address=address
+            )
+
+        elif user.role == 'teacher':
+
+            TeacherProfile.objects.create(
+
+                user=user,
+
+                employee_id=employee_id,
+
+                department=department,
+
+                designation=designation
+            )
+
+        return user
+    
+
+
+
+
+
+class CustomLoginSerializer(
+    TokenObtainPairSerializer
+):
+
+    def validate(self, attrs):
+
+        data = super().validate(attrs)
+
+        user = self.user
+
+        # COMMON USER DATA
+        response_data = {
+
+            'id': user.id,
+
+            'username': user.username,
+
+            'email': user.email,
+
+            'role': user.role,
+
+            'first_name': user.first_name,
+
+            'last_name': user.last_name,
+        }
+
+        # STUDENT PROFILE
+        if user.role == 'student':
+
+            try:
+
+                profile = StudentProfile.objects.get(
+                    user=user
+                )
+
+                response_data['student_profile'] = {
+
+                    'roll_number': profile.roll_number,
+
+                    'class_level': profile.class_level,
+
+                    'section': profile.section,
+
+                    'group': profile.group,
+                }
+
+            except StudentProfile.DoesNotExist:
+
+                response_data['student_profile'] = None
+
+        # TEACHER PROFILE
+        elif user.role == 'teacher':
+
+            try:
+
+                profile = TeacherProfile.objects.get(
+                    user=user
+                )
+
+                response_data['teacher_profile'] = {
+
+                    'employee_id': profile.employee_id,
+
+                    'department': profile.department,
+
+                    'designation': profile.designation,
+                }
+
+            except TeacherProfile.DoesNotExist:
+
+                response_data['teacher_profile'] = None
+
+        # FINAL RESPONSEee
+        return {
+
+            'refresh': data['refresh'],
+
+            'access': data['access'],
+
+            'user': response_data
+        }
+
+
+
+
+
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = '__all__'
