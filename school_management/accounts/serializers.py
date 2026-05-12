@@ -1,5 +1,6 @@
 from rest_framework import serializers
-
+from django.contrib.auth import authenticate
+from rest_framework.exceptions import AuthenticationFailed
 from .models import (
     User,
     StudentProfile,
@@ -15,80 +16,63 @@ class CustomLoginSerializer(
     TokenObtainPairSerializer
 ):
 
+    email = serializers.EmailField()
+
+    password = serializers.CharField(
+        write_only=True
+    )
+
+    username = None
+
     def validate(self, attrs):
 
-        data = super().validate(attrs)
+        email = attrs.get('email')
 
-        user = self.user
+        password = attrs.get('password')
 
-        # COMMON USER DATA
+        try:
+
+            user = User.objects.get(email=email)
+
+        except User.DoesNotExist:
+
+            raise AuthenticationFailed(
+                'Invalid email or password'
+            )
+
+        authenticated_user = authenticate(
+            username=user.username,
+            password=password
+        )
+
+        if not authenticated_user:
+
+            raise AuthenticationFailed(
+                'Invalid email or password'
+            )
+
+        self.user = authenticated_user
+
+        refresh = self.get_token(authenticated_user)
+
+        access = refresh.access_token
+
         response_data = {
 
-            'id': user.id,
+            'id': authenticated_user.id,
 
-            'username': user.username,
+            'username': authenticated_user.username,
 
-            'email': user.email,
+            'email': authenticated_user.email,
 
-            'role': user.role,
-
-            'first_name': user.first_name,
-
-            'last_name': user.last_name,
+            'role': authenticated_user.role,
         }
 
-        # STUDENT PROFILE
-        if user.role == 'student':
-
-            try:
-
-                profile = StudentProfile.objects.get(
-                    user=user
-                )
-
-                response_data['student_profile'] = {
-
-                    'roll_number': profile.roll_number,
-
-                    'class_level': profile.class_level,
-
-                    'section': profile.section,
-
-                    'group': profile.group,
-                }
-
-            except StudentProfile.DoesNotExist:
-
-                response_data['student_profile'] = None
-
-        # TEACHER PROFILE
-        elif user.role == 'teacher':
-
-            try:
-
-                profile = TeacherProfile.objects.get(
-                    user=user
-                )
-
-                response_data['teacher_profile'] = {
-
-                    'employee_id': profile.employee_id,
-
-                    'department': profile.department,
-
-                    'designation': profile.designation,
-                }
-
-            except TeacherProfile.DoesNotExist:
-
-                response_data['teacher_profile'] = None
-
-        # FINAL RESPONSE
         return {
 
-            'refresh': data['refresh'],
+            'refresh': str(refresh),
 
-            'access': data['access'],
+            'access': str(access),
 
             'user': response_data
         }

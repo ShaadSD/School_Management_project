@@ -42,9 +42,8 @@ class Command(BaseCommand):
             self.style.SUCCESS('Seeding started...')
         )
 
-        # -----------------------------
+
         # ADMIN
-        # -----------------------------
 
         admin, created = User.objects.get_or_create(
             username='admin'
@@ -57,9 +56,8 @@ class Command(BaseCommand):
         admin.set_password('admin123')
         admin.save()
 
-        # -----------------------------
         # TEACHERS
-        # -----------------------------
+ 
 
         teachers = []
 
@@ -85,9 +83,9 @@ class Command(BaseCommand):
 
             teachers.append(teacher)
 
-        # -----------------------------
+    
         # PARENT
-        # -----------------------------
+    
 
         parent, created = User.objects.get_or_create(
             username='parent1'
@@ -98,9 +96,8 @@ class Command(BaseCommand):
         parent.set_password('parent123')
         parent.save()
 
-        # -----------------------------
         # STUDENTS
-        # -----------------------------
+  
 
         students = []
 
@@ -144,9 +141,9 @@ class Command(BaseCommand):
 
             students.append(student)
 
-        # -----------------------------
+    
         # PARENT LINK
-        # -----------------------------
+
 
         ParentStudentLink.objects.get_or_create(
             parent=parent,
@@ -160,9 +157,9 @@ class Command(BaseCommand):
             relationship='Father'
         )
 
-        # -----------------------------
+
         # SUBJECTS
-        # -----------------------------
+  
 
         subject_data = [
 
@@ -207,9 +204,9 @@ class Command(BaseCommand):
 
             subjects.append(subject)
 
-        # -----------------------------
+
         # SUBJECT ASSIGNMENTS
-        # -----------------------------
+  
 
         for i, subject in enumerate(subjects):
 
@@ -226,10 +223,8 @@ class Command(BaseCommand):
                 academic_year=2025
             )
 
-        # -----------------------------
         # EXAM
-        # -----------------------------
-
+  
         exam, created = Exam.objects.get_or_create(
 
             name='Half-Yearly 2025',
@@ -244,9 +239,9 @@ class Command(BaseCommand):
             }
         )
 
-        # -----------------------------
+
         # MARKS
-        # -----------------------------
+   
 
         for student in students:
 
@@ -291,9 +286,9 @@ class Command(BaseCommand):
                 exam
             )
 
-        # -----------------------------
+  
         # MERIT LIST
-        # -----------------------------
+
 
         generate_merit_list(
             exam,
@@ -301,16 +296,16 @@ class Command(BaseCommand):
             section='A'
         )
 
-        # -----------------------------
+
         # PUBLISH RESULT
-        # -----------------------------
+
 
         exam.is_published = True
         exam.save()
 
-        # -----------------------------
+  
         # ATTENDANCE
-        # -----------------------------
+  
 
         today = date.today()
 
@@ -342,9 +337,9 @@ class Command(BaseCommand):
                     }
                 )
 
-        # -----------------------------
+    
         # OUTPUT
-        # -----------------------------
+   
 
         self.stdout.write(
             self.style.SUCCESS(
