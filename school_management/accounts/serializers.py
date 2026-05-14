@@ -133,6 +133,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             }
         }
 
+    def validate(self, attrs):
+        role = attrs.get('role')
+
+        if role == 'student':
+            for field in ['roll_number', 'class_level', 'section', 'father_name', 'mother_name', 'address']:
+                if attrs.get(field) is None:
+                    raise serializers.ValidationError(
+                        {field: 'This field is required for students.'}
+                    )
+
+        elif role == 'teacher':
+            for field in ['employee_id', 'department', 'designation']:
+                if not attrs.get(field):
+                    raise serializers.ValidationError(
+                        {field: 'This field is required for teachers.'}
+                    )
+
+        return attrs
+
     def create(self, validated_data):
 
 
@@ -248,3 +267,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }

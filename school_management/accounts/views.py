@@ -28,7 +28,7 @@ class RegisterView(APIView):
                 status=status.HTTP_201_CREATED
             )
 
-        return Response(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MeView(APIView):
@@ -67,7 +67,13 @@ class StudentProfileView(APIView):
                 status=403
             )
 
-        profile = user.studentprofile
+        try:
+            profile = user.studentprofile
+        except Exception:
+            return Response(
+                {'error': 'Student profile not found'},
+                status=404
+            )
 
         data = {
 

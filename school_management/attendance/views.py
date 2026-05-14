@@ -53,6 +53,12 @@ class MarkAttendanceView(APIView):
 
         records = request.data.get('records')
 
+        if not class_level or not section or not date or not records:
+            return Response(
+                {'error': 'class_level, section, date, and records are required'},
+                status=400
+            )
+
         # TEACHER ASSIGNMENT CHECK
         assigned = SubjectAssignment.objects.filter(
             teacher=user,

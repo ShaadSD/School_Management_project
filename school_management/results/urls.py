@@ -3,8 +3,6 @@ from django.urls import path
 from .views import (
     MarksEntryView,
     BulkMarksEntryView,
-    MarksEntryView,
-    BulkMarksEntryView,
     MyResultView,
     SectionResultView,
     MeritListView,
