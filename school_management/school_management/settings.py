@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -127,6 +127,25 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+
+
+SIMPLE_JWT = {
+    # Access token will last 1 hour
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=20),
+    
+    # Refresh token will last 30 days (allows long-time login)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    
+    # Refreshing a token returns a new access token AND a new refresh token
+    'ROTATE_REFRESH_TOKENS': True,
+    
+    # Blacklist old refresh tokens after they are rotated
+    'BLACKLIST_AFTER_ROTATION': True,
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 
 
 # Static files (CSS, JavaScript, Images)
