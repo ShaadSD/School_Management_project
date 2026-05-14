@@ -111,6 +111,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'role',
             'first_name',
             'last_name',
+            'phone',
 
             # student
             'roll_number',
