@@ -106,7 +106,13 @@ class MarksEntryView(APIView):
             exam = serializer.validated_data['exam']
 
             # GET STUDENT PROFILE
-            profile = student.studentprofile
+            try:
+                profile = student.studentprofile
+            except Exception:
+                return Response(
+                    {'error': 'Student profile not found'},
+                    status=400
+                )
 
             # CHECK TEACHER ASSIGNMENT
             assigned = SubjectAssignment.objects.filter(
@@ -250,11 +256,11 @@ class BulkMarksEntryView(APIView):
 
         try:
 
-            subject = Subject.objects.get(id=subject_id)
+            subject = Subject.objects.get(code=subject_id)
 
             exam = Exam.objects.get(id=exam_id)
 
-        except:
+        except (Subject.DoesNotExist, Exam.DoesNotExist):
 
             return Response(
                 {
@@ -291,7 +297,14 @@ class BulkMarksEntryView(APIView):
 
                     continue
 
-                profile = student.studentprofile
+                try:
+                    profile = student.studentprofile
+                except Exception:
+                    errors.append({
+                        'student_id': student.id,
+                        'error': 'Student profile not found'
+                    })
+                    continue
 
                 assigned = SubjectAssignment.objects.filter(
                     teacher=user,
