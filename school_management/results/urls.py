@@ -22,15 +22,6 @@ urlpatterns = [
         'marks/bulk/',
         BulkMarksEntryView.as_view()
     ),
-      path(
-        'marks/',
-        MarksEntryView.as_view()
-    ),
-
-    path(
-        'marks/bulk/',
-        BulkMarksEntryView.as_view()
-    ),
 
     path(
         'results/<int:exam_id>/my/',
