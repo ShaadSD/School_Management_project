@@ -23,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@p)6r_vs2s=m0p@=xmch!a2i6o#ur)n18()a=zh9fv0#sy^g*q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
-    "school-management-project-n5r1.onrender.com",
+    "*",
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
