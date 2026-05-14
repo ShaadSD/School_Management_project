@@ -3,7 +3,18 @@
     "allow": [
       "Bash(Get-ChildItem -Path \"f:\\\\Project\\\\student managment\\\\School_Management_project\\\\school_management\" -Recurse -Filter \"*.py\")",
       "Bash(Select-Object FullName)",
-      "Bash(Sort-Object FullName)"
+      "Bash(Sort-Object FullName)",
+      "Bash(Get-ChildItem -Path \"f:\\\\Project\\\\student managment\\\\School_Management_project\" -Recurse -Include *.js, *.jsx, *.ts, *.tsx, *.html, *.php, *.py -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(python manage.py shell -c ' *)",
+      "Bash(py manage.py shell -c ' *)",
+      "Bash(where python3 *)",
+      "Bash(where python *)",
+      "Bash('C:\\\\Users\\\\SDG\\\\AppData\\\\Local\\\\Python\\\\bin\\\\python3.exe' manage.py shell -c ' *)",
+      "Bash(ls \"f:\\\\Project\\\\student managment\\\\\")",
+      "Read(//f/Project/**)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\SDG\" -Name | Where-Object { $_ -match \"venv|env|python|conda\" })",
+      "PowerShell(&\"C:\\\\Users\\\\SDG\\\\AppData\\\\Local\\\\Python\\\\bin\\\\python3.exe\" -c \"import sys; print\\(sys.executable\\)\")"
     ]
   }
 }
