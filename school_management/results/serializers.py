@@ -98,6 +98,16 @@ class StudentResultSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    exam_name = serializers.CharField(
+        source='exam.name',
+        read_only=True
+    )
+
+    exam_type = serializers.CharField(
+        source='exam.exam_type',
+        read_only=True
+    )
+
     marks = serializers.SerializerMethodField()
 
     class Meta:
@@ -106,6 +116,10 @@ class StudentResultSerializer(serializers.ModelSerializer):
 
         fields = [
             'student_name',
+
+            'exam_name',
+            'exam_type',
+
             'gpa',
             'total_marks',
             'class_position',

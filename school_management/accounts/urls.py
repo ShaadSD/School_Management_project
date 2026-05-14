@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     RegisterView,
     MeView,
-    LoginView
+    LoginView,
+    StudentProfileView
 )
 
 from rest_framework_simplejwt.views import (
@@ -30,5 +31,9 @@ urlpatterns = [
     path(
         'me/',
         MeView.as_view()
+    ),
+    path(
+    'student/profile/',
+    StudentProfileView.as_view()
     ),
 ]
