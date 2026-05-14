@@ -220,6 +220,7 @@ class SectionAttendanceView(APIView):
 
         user = request.user
 
+        # ONLY TEACHER OR ADMIN
         if user.role not in ['teacher', 'admin']:
 
             return Response(
@@ -228,6 +229,20 @@ class SectionAttendanceView(APIView):
                 },
                 status=403
             )
+
+        # TEACHER ASSIGNMENT CHECK
+        if user.role == 'teacher':
+
+            assigned = SubjectAssignment.objects.filter(
+                teacher=user,
+                class_level=class_level,
+                section=section
+            ).exists()
+
+            # RETURN EMPTY ARRAY INSTEAD OF 403
+            if not assigned:
+
+                return Response([])
 
         date = request.GET.get('date')
 
