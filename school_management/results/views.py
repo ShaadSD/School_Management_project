@@ -151,6 +151,75 @@ class BulkMarksEntryView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+
+        user = request.user
+
+        if user.role != 'teacher':
+
+            return Response(
+                {
+                    'error': 'Only teachers allowed'
+                },
+                status=403
+            )
+
+        class_level = request.query_params.get(
+            'class_level'
+        )
+
+        section = request.query_params.get(
+            'section'
+        )
+
+        if not class_level or not section:
+
+            return Response(
+                {
+                    'error': 'class_level and section are required'
+                },
+                status=400
+            )
+
+        # TEACHER ASSIGNMENT CHECK
+        assigned = SubjectAssignment.objects.filter(
+            teacher=user,
+            class_level=class_level,
+            section=section
+        ).exists()
+
+        if not assigned:
+
+            return Response(
+                {
+                    'error': 'You are not assigned to this section'
+                },
+                status=403
+            )
+
+        students = StudentProfile.objects.filter(
+            class_level=class_level,
+            section=section
+        ).select_related(
+            'user'
+        ).order_by(
+            'roll_number'
+        )
+
+        data = []
+
+        for profile in students:
+
+            data.append({
+                'student_id': profile.user.id,
+                'full_name': profile.user.get_full_name(),
+                'roll_number': profile.roll_number
+            })
+
+        return Response(data)
+
+
+
     def post(self, request):
 
         user = request.user
@@ -169,6 +238,15 @@ class BulkMarksEntryView(APIView):
         exam_id = request.data.get('exam')
 
         records = request.data.get('records')
+
+        if not records:
+
+            return Response(
+                {
+                    'error': 'No records provided'
+                },
+                status=400
+            )
 
         try:
 
@@ -200,7 +278,8 @@ class BulkMarksEntryView(APIView):
                 try:
 
                     student = User.objects.get(
-                        id=data['student_id']
+                        id=data['student_id'],
+                        role='student'
                     )
 
                 except User.DoesNotExist:
@@ -214,7 +293,6 @@ class BulkMarksEntryView(APIView):
 
                 profile = student.studentprofile
 
-                # CHECK ASSIGNMENT
                 assigned = SubjectAssignment.objects.filter(
                     teacher=user,
                     subject=subject,
@@ -238,9 +316,33 @@ class BulkMarksEntryView(APIView):
                     0
                 ) or 0
 
+                if (
+                    written < 0 or
+                    mcq < 0 or
+                    practical < 0
+                ):
+
+                    errors.append({
+                        'student_id': student.id,
+                        'error': 'Marks cannot be negative'
+                    })
+
+                    continue
+
+                if (
+                    subject.has_practical is False
+                    and practical > 0
+                ):
+
+                    errors.append({
+                        'student_id': student.id,
+                        'error': 'This subject has no practical'
+                    })
+
+                    continue
+
                 total = written + mcq + practical
 
-                # FULL MARKS CHECK
                 if total > subject.full_marks:
 
                     errors.append({
@@ -262,13 +364,15 @@ class BulkMarksEntryView(APIView):
                     }
                 )
 
-                # UPDATE RESULT
                 calculate_student_result(
                     student,
                     exam
                 )
 
-                success.append(student.username)
+                success.append({
+                    'student_id': student.id,
+                    'student': student.get_full_name()
+                })
 
             else:
 
@@ -277,6 +381,7 @@ class BulkMarksEntryView(APIView):
         return Response({
             'success_count': len(success),
             'error_count': len(errors),
+            'success': success,
             'errors': errors
         })
 
