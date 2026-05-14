@@ -12,30 +12,23 @@ from rest_framework_simplejwt.serializers import (
 
 
 
-class CustomLoginSerializer(
-    TokenObtainPairSerializer
-):
+class CustomLoginSerializer(TokenObtainPairSerializer):
+
+    username_field = User.EMAIL_FIELD
 
     email = serializers.EmailField()
 
-    password = serializers.CharField(
-        write_only=True
-    )
-
-    username = None
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
 
         email = attrs.get('email')
-
         password = attrs.get('password')
 
         try:
-
             user = User.objects.get(email=email)
 
         except User.DoesNotExist:
-
             raise AuthenticationFailed(
                 'Invalid email or password'
             )
@@ -46,34 +39,24 @@ class CustomLoginSerializer(
         )
 
         if not authenticated_user:
-
             raise AuthenticationFailed(
                 'Invalid email or password'
             )
-
-        self.user = authenticated_user
 
         refresh = self.get_token(authenticated_user)
 
         access = refresh.access_token
 
         response_data = {
-
             'id': authenticated_user.id,
-
             'username': authenticated_user.username,
-
             'email': authenticated_user.email,
-
             'role': authenticated_user.role,
         }
 
         return {
-
             'refresh': str(refresh),
-
             'access': str(access),
-
             'user': response_data
         }
 
