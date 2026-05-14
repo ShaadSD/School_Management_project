@@ -25,6 +25,54 @@ from .services import calculate_student_result,generate_merit_list
 User = get_user_model()
 
 
+class DashboardStatsView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        user = request.user
+
+        if user.role != 'admin':
+
+            return Response(
+                {
+                    'error': 'Only admin allowed'
+                },
+                status=403
+            )
+
+        total_students = User.objects.filter(
+            role='student'
+        ).count()
+
+        total_teachers = User.objects.filter(
+            role='teacher'
+        ).count()
+
+        total_parents = User.objects.filter(
+            role='parent'
+        ).count()
+
+        total_subjects = Subject.objects.count()
+
+        total_exams = Exam.objects.count()
+
+        return Response({
+
+            'total_students': total_students,
+
+            'total_teachers': total_teachers,
+
+            'total_parents': total_parents,
+
+            'total_subjects': total_subjects,
+
+            'total_exams': total_exams,
+        })
+
+
+
 
 
 class MarksEntryView(APIView):

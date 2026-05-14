@@ -9,10 +9,14 @@ from .views import (
     SectionResultView,
     MeritListView,
     PublishResultView,
+    DashboardStatsView
 )
 
 urlpatterns = [
-
+    path(
+        'dashboard/stats/',
+        DashboardStatsView.as_view()
+    ),
     path(
         'marks/',
         MarksEntryView.as_view()
